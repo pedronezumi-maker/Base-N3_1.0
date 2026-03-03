@@ -5,7 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="no-referrer">
     <title>Manual Operacional N3 - Access.Run (Master)</title>
-    
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#561c84">
+    <meta name="application-name" content="Access.Run N3">
+    <meta name="description" content="Base de conhecimento e diagnóstico inteligente para suporte N3">
+
+    <!-- iOS (Apple) — PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Access.Run N3">
+    <link rel="apple-touch-icon" href="/images/app-icon-512x512.png">
+
+    <!-- Ícone Padrão -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/app-icon-192x192.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -639,6 +656,10 @@
         <button onclick="askAI()" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-colors min-w-[3rem]">
             <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
             <span class="text-[9px] font-medium">IA</span>
+        </button>
+        <button id="pwaInstallBtn" onclick="installPWA()" class="hidden flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-colors min-w-[3rem]">
+            <i class="fa-solid fa-download text-lg"></i>
+            <span class="text-[9px] font-medium">Instalar</span>
         </button>
         <button onclick="toggleMobileSidebar()" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-colors min-w-[3rem]">
             <i class="fa-solid fa-bars text-lg"></i>
@@ -4104,6 +4125,26 @@ Contexto da Base de Dados: ${contextString}
             }
         });
 
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('pwaInstallBtn');
+            if (installBtn) installBtn.classList.remove('hidden');
+        });
+
+        function installPWA() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(choice => {
+                console.log('[PWA] Escolha:', choice.outcome);
+                deferredPrompt = null;
+                const installBtn = document.getElementById('pwaInstallBtn');
+                if (installBtn) installBtn.classList.add('hidden');
+            });
+        }
+
         window.onload = () => {
             if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
             populateCategorySelect();
@@ -4201,6 +4242,17 @@ Contexto da Base de Dados: ${contextString}
                 }
             });
         };
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/pwabuilder-sw.js')
+                    .then(reg => console.log('[SW] Registrado:', reg.scope))
+                    .catch(err => console.warn('[SW] Falha:', err));
+            });
+        }
     </script>
 
     <!-- Portal para tooltips de dicas de campo — fora de scroll containers para evitar clipping -->
