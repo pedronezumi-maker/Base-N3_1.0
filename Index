@@ -2,10 +2,30 @@
 <html lang="pt-BR" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="referrer" content="no-referrer">
     <title>Manual Operacional N3 - Access.Run (Master)</title>
-    
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#561c84">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Access.Run N3">
+    <meta name="application-name" content="Access.Run N3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="Manual Operacional N3 - Sistema de Suporte Técnico Access.Run">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+
+    <!-- Performance: DNS Prefetch & Preconnect -->
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    <link rel="dns-prefetch" href="https://generativelanguage.googleapis.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -46,6 +66,62 @@
     </script>
 
     <style>
+        /* ========== MOBILE & PWA OPTIMIZATIONS ========== */
+
+        /* Safe area support for notched devices */
+        body {
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-left: env(safe-area-inset-left, 0px);
+            padding-right: env(safe-area-inset-right, 0px);
+        }
+
+        /* Prevent iOS text size adjustment */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+        /* Smooth scrolling and overscroll behavior */
+        main, .overflow-y-auto {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+
+        /* Prevent pull-to-refresh on PWA */
+        body.pwa-standalone { overscroll-behavior-y: contain; }
+
+        /* Minimum touch target size (44x44px per WCAG) */
+        @media (pointer: coarse) {
+            button, [role="button"], a[href] {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            /* Exceptions for compact inline elements */
+            .btn-fav, .btn-copy, .btn-edit, .btn-toggle-hidden,
+            .char-counter, .field-hint-btn, .btn-refine,
+            .sort-opt, .cat-btn, .author-btn,
+            #searchHistoryList li, .card-actions-row button {
+                min-height: 36px;
+                min-width: 36px;
+            }
+        }
+
+        /* Disable tap highlight on interactive elements */
+        button, a, input, select, textarea {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Fix iOS input zoom (font-size < 16px triggers zoom) */
+        @media screen and (max-width: 767px) {
+            input[type="text"], input[type="password"], input[type="email"],
+            select, textarea {
+                font-size: 16px !important;
+            }
+        }
+
+        /* PWA standalone mode adjustments */
+        @media (display-mode: standalone) {
+            body { padding-top: env(safe-area-inset-top, 0px); }
+            #loginModal > div { padding-top: env(safe-area-inset-top, 20px); }
+        }
+
         /* Barra de rolagem personalizada */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -124,6 +200,8 @@
         /* Mobile Bottom Navigation */
         #mobileBottomNav {
             padding-bottom: env(safe-area-inset-bottom, 0px);
+            padding-left: env(safe-area-inset-left, 0px);
+            padding-right: env(safe-area-inset-right, 0px);
         }
 
         /* Search History Dropdown */
@@ -319,6 +397,20 @@
             transition: width 0.4s, background-color 0.4s;
         }
 
+        /* PWA Install Banner */
+        #pwaInstallBanner {
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* PWA Offline indicator */
+        #offlineIndicator {
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
         /* Refine button */
         .btn-refine {
             font-size: 10px;
@@ -362,8 +454,8 @@
             <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Identifique-se para acessar o Manual Operacional N3.</p>
             
             <form onsubmit="handleLogin(event)" autocomplete="off" class="space-y-4 text-left">
-                <input style="display:none" type="text" name="fakeusernameremembered"/>
-                <input style="display:none" type="password" name="fakepasswordremembered"/>
+                <input aria-hidden="true" type="text" name="fakeusernameremembered" tabindex="-1" class="absolute w-0 h-0 overflow-hidden opacity-0"/>
+                <input aria-hidden="true" type="password" name="fakepasswordremembered" tabindex="-1" class="absolute w-0 h-0 overflow-hidden opacity-0"/>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 ml-1">Usuário</label>
@@ -556,7 +648,7 @@
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-8 bg-slate-50 dark:bg-slate-900 scroll-smooth relative pb-24 md:pb-8" id="mainScroll">
+        <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-8 bg-slate-50 dark:bg-slate-900 scroll-smooth relative pb-28 md:pb-8" id="mainScroll" style="padding-bottom: max(7rem, calc(5rem + env(safe-area-inset-bottom, 0px)))">
             
             <div id="aiPanel" class="hidden mb-8 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-secondary dark:border-slate-700 overflow-hidden animate-fade-in ring-1 ring-primary/20">
                 <div class="bg-gradient-to-r from-secondary to-white dark:from-slate-800 dark:to-slate-800 px-6 py-4 border-b border-secondary dark:border-slate-700 flex justify-between items-center">
@@ -904,7 +996,7 @@
                     </div>
                     
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex justify-between items-center">
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex justify-between items-center">
                             <span>Material P/ Indexação IA (.pdf, .txt)</span>
                             <span id="docIndexLoader" class="hidden text-primary indexing-pulse text-[10px]"><i class="fa-solid fa-microchip"></i> Indexando...</span>
                         </label>
@@ -1967,7 +2059,7 @@ Esta ação não pode ser desfeita.`)) return;
                 
                 const card = document.createElement('div');
                 card.className = `kb-card bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 border-l-4 border-l-primary shadow-sm flex flex-col h-full relative animate-fade-in`;
-                card.style.animationDelay = `${index * 10}ms`; // Reduzido o delay visual para 10ms devido ao grande volume de registros
+                card.style.animationDelay = `${Math.min(index * 8, 300)}ms`; // Cap animation delay at 300ms for large sets
                 
                 let audit = '';
                 if (item.createdBy) {
@@ -1992,6 +2084,7 @@ Esta ação não pode ser desfeita.`)) return;
                     thumbImg.src = imgs[0]; // DOM assignment is safe; no HTML injection
                     thumbImg.className = "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500";
                     thumbImg.alt = "Anexo Visual";
+                    thumbImg.loading = "lazy";
                     const thumbOverlay = document.createElement('div');
                     thumbOverlay.className = "absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100";
                     thumbOverlay.innerHTML = `<i class="fa-solid fa-magnifying-glass-plus text-white drop-shadow-md text-2xl"></i>`;
@@ -2241,11 +2334,21 @@ ${newHidden ? 'Operadores não poderão mais visualizá-lo.' : 'O tópico voltar
             currentBase64Images.forEach((imgSrc, index) => {
                 const div = document.createElement('div');
                 div.className = "relative h-20 group rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600";
-                div.innerHTML = `
-                    <img src="${imgSrc}" class="w-full h-full object-cover">
-                    <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity">${index+1}</div>
-                    <button type="button" onclick="removeImage(${index})" class="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow-sm"><i class="fa-solid fa-times"></i></button>
-                `;
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.className = "w-full h-full object-cover";
+                img.alt = "Preview " + (index + 1);
+                const overlay = document.createElement('div');
+                overlay.className = "absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity";
+                overlay.textContent = String(index + 1);
+                const removeBtn = document.createElement('button');
+                removeBtn.type = "button";
+                removeBtn.className = "absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow-sm";
+                removeBtn.innerHTML = '<i class="fa-solid fa-times"></i>';
+                removeBtn.addEventListener('click', () => removeImage(index));
+                div.appendChild(img);
+                div.appendChild(overlay);
+                div.appendChild(removeBtn);
                 grid.appendChild(div);
             });
         }
@@ -2339,13 +2442,26 @@ ${newHidden ? 'Operadores não poderão mais visualizá-lo.' : 'O tópico voltar
             const loader = document.getElementById('docIndexLoader');
             if (loader) loader.classList.remove('hidden');
             const apiKey = await getGeminiKey();
+            const inputRef = this;
+
+            let pendingCount = 0;
+            let completedCount = 0;
+
+            function checkAllDone() {
+                completedCount++;
+                if (completedCount >= pendingCount) {
+                    if (loader) loader.classList.add('hidden');
+                    inputRef.value = "";
+                }
+            }
 
             for (const file of files) {
-                if (file.size > 500 * 1024) { // 500KB Limit para evitar estourar o 1MB do Firestore com Base64
+                if (file.size > 500 * 1024) {
                     alert(`O documento ${file.name} excede o limite de 500KB. Isso causará falha ao salvar no banco.`);
                     continue;
                 }
-                
+
+                pendingCount++;
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = async (event) => {
@@ -2363,22 +2479,20 @@ ${newHidden ? 'Operadores não poderão mais visualizá-lo.' : 'O tópico voltar
                             });
                         }
 
-                        // Se nao extraiu texto, salva como documento comum
                         if (!rawText || !rawText.trim()) {
                             currentBase64Docs.push({ name: file.name, type: file.type, data: dataUrl });
                             renderDocPreviews();
+                            checkAllDone();
                             return;
                         }
 
-                        // Dividir em blocos e gerar Embed via Gemini Text-Embedding
                         const chunksArray = chunkText(rawText);
                         const embeddingsObj = [];
-                        
+
                         for(const chunkStr of chunksArray) {
                             if(chunkStr.length < 10) continue;
                             const vector = await getEmbedding(chunkStr, apiKey);
                             if(vector) {
-                                // Forca array numerico limpo para seguranca do JSON.stringify
                                 embeddingsObj.push({ text: chunkStr, vector: Array.from(vector) });
                             }
                         }
@@ -2387,21 +2501,26 @@ ${newHidden ? 'Operadores não poderão mais visualizá-lo.' : 'O tópico voltar
                             name: file.name,
                             type: file.type,
                             data: dataUrl,
-                            rawText: rawText.substring(0, 3000), // Limite de caracteres para preview/save
-                            // FIX CRITICO: JSON.stringify evita o erro de "nested entity" do Firestore (arrays dentro de arrays).
-                            chunks: JSON.stringify(embeddingsObj), 
+                            rawText: rawText.substring(0, 3000),
+                            chunks: JSON.stringify(embeddingsObj),
                             createdAt: new Date().toISOString()
                         });
-                        
+
                         renderDocPreviews();
                     } catch (err) {
                         console.error("Erro na extração de texto", err);
                         alert(`Erro ao processar conteúdo de ${file.name}`);
                     }
+                    checkAllDone();
                 };
+                reader.onerror = () => checkAllDone();
             }
-            
-            setTimeout(() => { if (loader) loader.classList.add('hidden'); this.value = ""; }, 2000);
+
+            // If no valid files to process
+            if (pendingCount === 0) {
+                if (loader) loader.classList.add('hidden');
+                this.value = "";
+            }
         });
 
         function renderDocPreviews() {
@@ -2711,7 +2830,22 @@ ${newHidden ? 'Operadores não poderão mais visualizá-lo.' : 'O tópico voltar
                         } catch (e) {
                             throw new Error("Arquivo inválido: apenas JSON puro é aceito na importação.");
                         }
-                        
+
+                        // Validate imported data structure
+                        if (!Array.isArray(data)) throw new Error("Formato inválido: esperava um array de registros.");
+                        data = data.filter(item => {
+                            if (!item || typeof item !== 'object') return false;
+                            if (!item.id || !item.title) return false;
+                            // Sanitize string fields to prevent injection
+                            ['title','problem','step','script','category','createdBy'].forEach(key => {
+                                if (item[key] && typeof item[key] === 'string') {
+                                    item[key] = item[key].substring(0, key === 'step' ? 5000 : key === 'problem' ? 2000 : 1500);
+                                }
+                            });
+                            return true;
+                        });
+                        if (data.length === 0) throw new Error("Nenhum registro válido encontrado no arquivo.");
+
                         if (confirm(`Importar ${data.length} registros para a nuvem?`)) {
                             showToast("Iniciando upload em massa...", "blue");
                             
@@ -2988,13 +3122,17 @@ ${newHidden ? 'Operadores não poderão mais visualizá-lo.' : 'O tópico voltar
                 imgs.forEach((src, idx) => {
                     const imgDiv = document.createElement('div');
                     imgDiv.className = "group relative cursor-zoom-in overflow-hidden rounded-lg border border-slate-200 dark:border-slate-600 h-32";
-                    imgDiv.onclick = () => openImageGallery(id, idx);
-                    imgDiv.innerHTML = `
-                        <img src="${src}" class="w-full h-full object-cover bg-slate-100 dark:bg-slate-900 hover:scale-105 transition-transform duration-500">
-                        <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                            <i class="fa-solid fa-magnifying-glass-plus text-white text-2xl drop-shadow-md"></i>
-                        </div>
-                    `;
+                    imgDiv.addEventListener('click', () => openImageGallery(id, idx));
+                    const imgEl = document.createElement('img');
+                    imgEl.src = src;
+                    imgEl.className = "w-full h-full object-cover bg-slate-100 dark:bg-slate-900 hover:scale-105 transition-transform duration-500";
+                    imgEl.alt = "Anexo " + (idx + 1);
+                    imgEl.loading = "lazy";
+                    const hoverOverlay = document.createElement('div');
+                    hoverOverlay.className = "absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none";
+                    hoverOverlay.innerHTML = '<i class="fa-solid fa-magnifying-glass-plus text-white text-2xl drop-shadow-md"></i>';
+                    imgDiv.appendChild(imgEl);
+                    imgDiv.appendChild(hoverOverlay);
                     grid.appendChild(imgDiv);
                 });
                 imgContainer.classList.remove('hidden');
@@ -3275,10 +3413,11 @@ Retorne APENAS o script refinado, sem nada antes ou depois.`;
         }
 
         let _toastTimer = null;
+        const _toastBgClasses = ['bg-slate-800', 'bg-red-700', 'bg-blue-700', 'bg-amber-600'];
         function showToast(msg, color = "emerald") {
             const t = document.getElementById('toast');
+            if (!t) return;
             const icon = t.querySelector('i');
-            // Map color to tailwind bg + icon
             const colorMap = {
                 emerald: { bg: 'bg-slate-800', ic: 'fa-circle-check text-emerald-400' },
                 red:     { bg: 'bg-red-700',   ic: 'fa-circle-xmark text-white' },
@@ -3286,8 +3425,8 @@ Retorne APENAS o script refinado, sem nada antes ou depois.`;
                 amber:   { bg: 'bg-amber-600', ic: 'fa-triangle-exclamation text-white' },
             };
             const cfg = colorMap[color] || colorMap.emerald;
-            // Reset bg classes then apply new one
-            t.className = t.className.replace(/bg-\S+/g, '').trim();
+            // Remove only known toast bg classes (safe for dark mode)
+            _toastBgClasses.forEach(cls => t.classList.remove(cls));
             t.classList.add(cfg.bg);
             icon.className = `fa-solid ${cfg.ic}`;
             document.getElementById('toastMsg').textContent = msg;
@@ -3324,7 +3463,11 @@ Retorne APENAS o script refinado, sem nada antes ou depois.`;
 
         function toggleTheme() {
             document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            // Update PWA theme-color to match current theme
+            const metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) metaTheme.content = isDark ? '#0f172a' : '#561c84';
         }
 
         // =================================================================================
@@ -3752,20 +3895,21 @@ Contexto da Base de Dados: ${contextString}
         function toggleMobileSidebar() {
             const aside = document.getElementById('mainSidebar');
             const backdrop = document.getElementById('mobileSidebarBackdrop');
-            if (aside.classList.contains('hidden')) {
+            if (aside.classList.contains('hidden') || aside.classList.contains('-translate-x-full')) {
                 aside.classList.remove('hidden');
-                aside.classList.add('flex', 'fixed', 'inset-y-0', 'left-0', 'shadow-2xl');
+                aside.classList.add('flex', 'fixed', 'inset-y-0', 'left-0', 'shadow-2xl', '-translate-x-full');
                 backdrop.classList.remove('hidden');
+                // Force reflow before removing translateX for smooth animation
+                aside.offsetHeight;
                 requestAnimationFrame(() => aside.classList.remove('-translate-x-full'));
             } else {
                 aside.classList.add('-translate-x-full');
                 backdrop.classList.add('hidden');
                 setTimeout(() => {
                     aside.classList.add('hidden');
-                    aside.classList.remove('fixed', 'inset-y-0', 'left-0', 'shadow-2xl', 'flex');
+                    aside.classList.remove('fixed', 'inset-y-0', 'left-0', 'shadow-2xl', 'flex', '-translate-x-full');
                 }, 300);
             }
-
         }
 
         function openSettings() {
@@ -4104,17 +4248,112 @@ Contexto da Base de Dados: ${contextString}
             }
         });
 
+        // =================================================================================
+        // PWA: SERVICE WORKER & INSTALL PROMPT
+        // =================================================================================
+
+        let _deferredInstallPrompt = null;
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('SW registered:', reg.scope);
+                }).catch(err => {
+                    console.warn('SW registration failed:', err);
+                });
+            });
+        }
+
+        // Capture install prompt for "Add to Home Screen"
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            _deferredInstallPrompt = e;
+            // Show install banner after a brief delay
+            setTimeout(showPwaInstallBanner, 3000);
+        });
+
+        function showPwaInstallBanner() {
+            if (!_deferredInstallPrompt) return;
+            // Don't show if already dismissed in this session
+            if (sessionStorage.getItem('pwaInstallDismissed')) return;
+
+            const existing = document.getElementById('pwaInstallBanner');
+            if (existing) existing.remove();
+
+            const banner = document.createElement('div');
+            banner.id = 'pwaInstallBanner';
+            banner.className = 'fixed bottom-20 md:bottom-5 left-4 right-4 md:left-auto md:right-5 md:w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-[90] p-4 flex items-start gap-3';
+            banner.innerHTML = `
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-mobile-screen-button text-primary text-lg"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-slate-800 dark:text-white">Instalar Access.Run N3</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Acesse rapidamente como um app nativo no seu dispositivo.</p>
+                    <div class="flex gap-2 mt-2.5">
+                        <button id="pwaInstallBtn" class="bg-primary hover:bg-purple-800 text-white text-xs font-bold px-4 py-1.5 rounded-lg transition-all active:scale-95">Instalar</button>
+                        <button id="pwaInstallDismiss" class="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 px-3 py-1.5 transition-colors">Agora não</button>
+                    </div>
+                </div>
+                <button id="pwaInstallClose" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors flex-shrink-0">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            `;
+            document.body.appendChild(banner);
+
+            document.getElementById('pwaInstallBtn').addEventListener('click', async () => {
+                if (_deferredInstallPrompt) {
+                    _deferredInstallPrompt.prompt();
+                    const result = await _deferredInstallPrompt.userChoice;
+                    if (result.outcome === 'accepted') {
+                        showToast('App instalado com sucesso!', 'emerald');
+                    }
+                    _deferredInstallPrompt = null;
+                }
+                banner.remove();
+            });
+
+            document.getElementById('pwaInstallDismiss').addEventListener('click', () => {
+                sessionStorage.setItem('pwaInstallDismissed', 'true');
+                banner.remove();
+            });
+
+            document.getElementById('pwaInstallClose').addEventListener('click', () => {
+                sessionStorage.setItem('pwaInstallDismissed', 'true');
+                banner.remove();
+            });
+        }
+
+        // Detect standalone mode (PWA installed)
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            document.body.classList.add('pwa-standalone');
+        }
+
+        // Network status monitoring
+        function updateOnlineStatus() {
+            if (!navigator.onLine) {
+                showToast('Sem conexão com a internet. Operando offline.', 'amber');
+            }
+        }
+        window.addEventListener('online', () => showToast('Conexão restaurada!', 'emerald'));
+        window.addEventListener('offline', updateOnlineStatus);
+
         window.onload = () => {
-            if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+                const metaTheme = document.querySelector('meta[name="theme-color"]');
+                if (metaTheme) metaTheme.content = '#0f172a';
+            }
             populateCategorySelect();
-            checkCurrentSession(); 
+            checkCurrentSession();
             initFirebase().then(() => {
                 checkResetTokenInUrl();
             }).catch(() => {
                 checkResetTokenInUrl();
             });
             setupSearchDragAndDrop();
-            
+
             // Apply saved view mode
             setViewMode(_currentViewMode);
 
