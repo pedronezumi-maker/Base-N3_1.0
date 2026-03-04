@@ -1,4 +1,4 @@
-const CACHE_NAME = 'accessrun-n3-v1';
+const CACHE_NAME = 'accessrun-n3-v2';
 const SHELL_ASSETS = [
     '/',
     '/Index',

@@ -9,7 +9,7 @@
     "display_override": ["standalone", "fullscreen"],
     "orientation": "portrait",
     "theme_color": "#561c84",
-    "background_color": "#f8fafc",
+    "background_color": "#561c84",
     "lang": "pt-BR",
     "dir": "ltr",
     "categories": ["business", "productivity"],
