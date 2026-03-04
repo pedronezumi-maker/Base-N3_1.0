@@ -705,10 +705,6 @@
             <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
             <span class="text-[10px] font-medium">IA</span>
         </button>
-        <button id="pwaInstallBtn" onclick="installPWA()" class="hidden flex flex-col items-center justify-center gap-0.5 px-2 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-all min-w-[3.5rem]">
-            <i class="fa-solid fa-download text-xl"></i>
-            <span class="text-[10px] font-medium">Instalar</span>
-        </button>
         <button onclick="toggleMobileSidebar()" class="flex flex-col items-center justify-center gap-0.5 px-2 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-all min-w-[3.5rem]">
             <i class="fa-solid fa-bars text-xl"></i>
             <span class="text-[10px] font-medium">Menu</span>
@@ -4172,26 +4168,6 @@ Contexto da Base de Dados: ${contextString}
                 return;
             }
         });
-
-        // PWA Install Prompt
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const installBtn = document.getElementById('pwaInstallBtn');
-            if (installBtn) installBtn.classList.remove('hidden');
-        });
-
-        function installPWA() {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(choice => {
-                console.log('[PWA] Escolha:', choice.outcome);
-                deferredPrompt = null;
-                const installBtn = document.getElementById('pwaInstallBtn');
-                if (installBtn) installBtn.classList.add('hidden');
-            });
-        }
 
         window.onload = () => {
             if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
