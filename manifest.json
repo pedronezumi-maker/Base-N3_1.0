@@ -1,9 +1,12 @@
 {
     "name": "Manual Operacional N3 - Access.Run",
     "short_name": "Access.Run N3",
+    "id": "/",
     "description": "Base de conhecimento e diagnóstico inteligente para suporte N3",
     "start_url": "/",
+    "scope": "/",
     "display": "standalone",
+    "display_override": ["standalone", "fullscreen"],
     "orientation": "portrait",
     "theme_color": "#561c84",
     "background_color": "#f8fafc",

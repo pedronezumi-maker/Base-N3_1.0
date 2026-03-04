@@ -14,6 +14,9 @@
     <meta name="application-name" content="Access.Run N3">
     <meta name="description" content="Base de conhecimento e diagnóstico inteligente para suporte N3">
 
+    <!-- Android Chrome — PWA Fullscreen -->
+    <meta name="mobile-web-app-capable" content="yes">
+
     <!-- iOS (Apple) — PWA Support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -63,6 +66,32 @@
     </script>
 
     <style>
+        /* PWA Standalone Mode — fullscreen, no browser UI */
+        @media all and (display-mode: standalone), (display-mode: fullscreen) {
+            html, body {
+                overflow-x: hidden;
+                overscroll-behavior-y: contain;
+            }
+            /* Prevent pull-to-refresh in standalone */
+            body {
+                overscroll-behavior: none;
+            }
+        }
+        /* Standalone class (JS-detected for TWA/APK) */
+        html.pwa-standalone body {
+            overscroll-behavior: none;
+            overflow-x: hidden;
+        }
+        html.pwa-standalone {
+            /* Ensure status bar area is accounted for */
+            padding-top: env(safe-area-inset-top, 0px);
+        }
+
+        /* Eliminate 300ms tap delay globally */
+        html {
+            touch-action: manipulation;
+        }
+
         /* Barra de rolagem personalizada */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -141,6 +170,25 @@
         /* Mobile Bottom Navigation */
         #mobileBottomNav {
             padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        #mobileBottomNav button {
+            min-height: 48px;
+            min-width: 48px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: pointer;
+            position: relative;
+        }
+        #mobileBottomNav button:active {
+            transform: scale(0.92);
+            opacity: 0.7;
+        }
+        #mobileBottomNav button::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
         }
 
         /* Search History Dropdown */
@@ -639,31 +687,31 @@
     </button>
 
     <!-- Mobile Bottom Navigation -->
-    <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-40 flex items-center justify-around px-2 py-1">
-        <button onclick="mobileBotNav('search')" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-colors min-w-[3rem]">
-            <i class="fa-solid fa-magnifying-glass text-lg"></i>
-            <span class="text-[9px] font-medium">Buscar</span>
+    <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-40 flex items-center justify-around px-1 py-1">
+        <button onclick="mobileBotNav('search')" class="flex flex-col items-center justify-center gap-0.5 px-2 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-all min-w-[3.5rem]">
+            <i class="fa-solid fa-magnifying-glass text-xl"></i>
+            <span class="text-[10px] font-medium">Buscar</span>
         </button>
-        <button onclick="filterFavorites()" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-amber-400 transition-colors min-w-[3rem]">
-            <i class="fa-solid fa-star text-lg"></i>
-            <span class="text-[9px] font-medium">Favoritos</span>
+        <button onclick="filterFavorites()" class="flex flex-col items-center justify-center gap-0.5 px-2 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-amber-400 transition-all min-w-[3.5rem]">
+            <i class="fa-solid fa-star text-xl"></i>
+            <span class="text-[10px] font-medium">Favoritos</span>
         </button>
-        <button onclick="openEntryModal()" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-colors min-w-[3rem]">
-            <span class="w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-purple-900/30">
-                <i class="fa-solid fa-plus text-white text-base"></i>
+        <button onclick="openEntryModal()" class="flex flex-col items-center justify-center gap-0.5 px-2 py-2 rounded-xl transition-all min-w-[3.5rem]">
+            <span class="w-11 h-11 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-purple-900/30">
+                <i class="fa-solid fa-plus text-white text-lg"></i>
             </span>
         </button>
-        <button onclick="askAI()" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-colors min-w-[3rem]">
-            <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
-            <span class="text-[9px] font-medium">IA</span>
+        <button onclick="askAI()" class="flex flex-col items-center justify-center gap-0.5 px-2 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-all min-w-[3.5rem]">
+            <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+            <span class="text-[10px] font-medium">IA</span>
         </button>
-        <button id="pwaInstallBtn" onclick="installPWA()" class="hidden flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-colors min-w-[3rem]">
-            <i class="fa-solid fa-download text-lg"></i>
-            <span class="text-[9px] font-medium">Instalar</span>
+        <button id="pwaInstallBtn" onclick="installPWA()" class="hidden flex flex-col items-center justify-center gap-0.5 px-2 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-all min-w-[3.5rem]">
+            <i class="fa-solid fa-download text-xl"></i>
+            <span class="text-[10px] font-medium">Instalar</span>
         </button>
-        <button onclick="toggleMobileSidebar()" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-colors min-w-[3rem]">
-            <i class="fa-solid fa-bars text-lg"></i>
-            <span class="text-[9px] font-medium">Menu</span>
+        <button onclick="toggleMobileSidebar()" class="flex flex-col items-center justify-center gap-0.5 px-2 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-purple-400 transition-all min-w-[3.5rem]">
+            <i class="fa-solid fa-bars text-xl"></i>
+            <span class="text-[10px] font-medium">Menu</span>
         </button>
     </nav>
 
@@ -4244,7 +4292,7 @@ Contexto da Base de Dados: ${contextString}
         };
     </script>
 
-    <!-- Service Worker Registration -->
+    <!-- Service Worker Registration + Standalone Detection -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -4253,6 +4301,21 @@ Contexto da Base de Dados: ${contextString}
                     .catch(err => console.warn('[SW] Falha:', err));
             });
         }
+
+        // Detect standalone mode (installed PWA / TWA / APK)
+        (function() {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                || window.matchMedia('(display-mode: fullscreen)').matches
+                || window.navigator.standalone === true
+                || document.referrer.includes('android-app://');
+            if (isStandalone) {
+                document.documentElement.classList.add('pwa-standalone');
+            }
+            // Also listen for changes (e.g., user installs while page is open)
+            window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
+                if (e.matches) document.documentElement.classList.add('pwa-standalone');
+            });
+        })();
     </script>
 
     <!-- Portal para tooltips de dicas de campo — fora de scroll containers para evitar clipping -->
